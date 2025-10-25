@@ -1,0 +1,39 @@
+<main class="container">
+  <h1>Gumlet Video Playlist</h1>
+
+  <section class="player" >
+   <p class="url"> URL : {{ currentVideoUrl   }}</p>
+    <iframe
+      #playerFrame
+      [src]="safeSrc"
+      style="width: 100%; aspect-ratio: 16 / 9; border: 0; top: 0; left: 0; width: 100%; height: 100%;"
+      allow="fullscreen; picture-in-picture;"
+      allowfullscreen
+      playsinline
+      webkit-playsinline
+      (load)="onFrameLoad()"
+    ></iframe>
+  </section>
+
+  <section class="controls">
+    <button type="button" (click)="showPrevious()" [disabled]="!hasPrevious()">Previous</button>
+    <span>Video {{ currentVideoIndex + 1 }} of {{ videos.length }}</span>
+    <button type="button" (click)="showNext()" [disabled]="!hasNext()">Next</button>
+  </section>
+
+  <section class="playlist">
+    <h2>Playlist</h2>
+    <ol>
+      <li *ngFor="let video of videos; index as i">
+        <button
+          type="button"
+          (click)="selectVideo(i)"
+          [attr.aria-current]="currentVideoIndex === i"
+          [disabled]="currentVideoIndex === i"
+        >
+          Video {{ i + 1 }}
+        </button>
+      </li>
+    </ol>
+  </section>
+</main>
