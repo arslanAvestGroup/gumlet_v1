@@ -20,7 +20,7 @@ export class AppComponent implements OnInit {
   ];
   readonly params: Record<string, string | number | boolean> = {
     background: false,
-    autoplay: false,
+    autoplay: true,
     loop: false,
     disableControls: false,
     muted: false,
@@ -29,9 +29,10 @@ export class AppComponent implements OnInit {
 
   currentVideoIndex = 0;
   safeSrc?: SafeResourceUrl;
-  // private playerInstance?: playerjs.Player;
   private playerInstance?: PlayerInstance;
   currentVideoUrl: string = '';
+  currentVolumne: number = 50;
+  videoRendered: boolean = false;
 
   constructor(private readonly sanitizer: DomSanitizer) {}
 
@@ -43,7 +44,6 @@ export class AppComponent implements OnInit {
     if (this.currentVideoIndex === 0) {
       return;
     }
-
     this.currentVideoIndex--;
     this.updateSafeSrc();
   }
@@ -61,7 +61,6 @@ export class AppComponent implements OnInit {
     if (index < 0 || index >= this.videos.length || index === this.currentVideoIndex) {
       return;
     }
-
     this.currentVideoIndex = index;
     this.updateSafeSrc();
   }
@@ -74,7 +73,7 @@ export class AppComponent implements OnInit {
     return this.currentVideoIndex < this.videos.length - 1;
   }
 
-  onFrameLoad(): void {
+ onFrameLoad(){
     const iframeElement = this.playerFrame?.nativeElement;
 
     if (!iframeElement) {
@@ -86,9 +85,22 @@ export class AppComponent implements OnInit {
 
       // Ready
       this.playerInstance.on('ready', async () => {
-          console.log('DEV22 >>> Gumlet >> player is ready ', this);
+          console.log('Gumlet >> player is ready ', this);
           try { await (this.playerInstance as any)?.play?.(); } catch {}
           try { await (this.playerInstance as any)?.unmute?.(); } catch {}
+          this.videoRendered = false;
+      });
+
+      // Ready
+      this.playerInstance.on('timeupdate', async () => {
+        // console.log('DEV22 >>> Gumlet >> timeupdate ', this);
+        if(!this.videoRendered){
+          console.log('Gumlet >> timeupdate', this);
+          this.videoRendered = true;
+          try { await (this.playerInstance as any)?.play?.(); } catch {}
+          try { await (this.playerInstance as any)?.unmute?.(); } catch {}
+        }
+
       });
 
 
@@ -98,6 +110,7 @@ export class AppComponent implements OnInit {
   }
 
   private updateSafeSrc(): void {
+     this.videoRendered = false;
     const url = this.appendParams(this.videos[this.currentVideoIndex]);
     this.currentVideoUrl = url;
     this.safeSrc = this.sanitizer.bypassSecurityTrustResourceUrl(url);
