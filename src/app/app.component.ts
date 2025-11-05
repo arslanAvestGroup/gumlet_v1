@@ -88,21 +88,9 @@ export class AppComponent implements OnInit {
           console.log('Gumlet >> player is ready ', this);
           try { await (this.playerInstance as any)?.play?.(); } catch {}
           try { await (this.playerInstance as any)?.unmute?.(); } catch {}
+          try { await (this.playerInstance as any)?.setVolume?.(100); } catch {}
           this.videoRendered = false;
       });
-
-      // Ready
-      this.playerInstance.on('timeupdate', async () => {
-        // console.log('DEV22 >>> Gumlet >> timeupdate ', this);
-        if(!this.videoRendered){
-          console.log('Gumlet >> timeupdate', this);
-          this.videoRendered = true;
-          try { await (this.playerInstance as any)?.play?.(); } catch {}
-          try { await (this.playerInstance as any)?.unmute?.(); } catch {}
-        }
-
-      });
-
 
     } catch (error) {
       console.warn('Failed to initialise Gumlet Player', error);
